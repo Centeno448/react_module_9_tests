@@ -191,3 +191,131 @@ test('App lee las tareas de localStorage despues de refrescar la página | Aseg�
   if(!implemented) throw new Error("not implemented")
 
 });
+
+test('App maneja click en Limpiar Tareas Completadas | Asegúrate de que en App.js el boton que de agregar tareas diga "Limpiar Tareas Completadas" y maneje el evento onClick con una función llamada "manejoLimpiarTareas" que reciba 1 parámetro', () => {
+  const wrapper = shallow(<App />)
+  const buttons = wrapper.find('button')
+  const firstButton = buttons.at(0);
+  const secondButton = buttons.at(1);
+
+  let deleteButton = undefined;
+  if(firstButton.text().includes("Limpiar Tareas Completadas")){
+    deleteButton = firstButton;
+  }
+  else if (secondButton.text().includes("Limpiar Tareas Completadas")){
+    deleteButton = secondButton
+  }
+  else{
+    throw new Error('No existe el botón');
+  }
+
+  expect(deleteButton.prop('onClick')).toBeDefined()
+  expect(deleteButton.prop('onClick').name).toBe('manejoLimpiarTareas')
+  expect(deleteButton.prop('onClick').length).toBe(1)
+});
+
+test('App elimina las tareas completadas | Asegúrate de que la función manejoLimpiarTareas limpie las tareas completadas' ,() => {
+  const wrapper = mount(<App />)
+  const buttons = wrapper.find('button')
+
+  const firstButton = buttons.at(0);
+  const secondButton = buttons.at(1);
+  let addButton = undefined;
+  let deleteButton = undefined;
+
+  if(firstButton.text().includes("Añadir Tarea")){
+    addButton = firstButton;
+  }
+  else if (secondButton.text().includes("Añadir Tarea")){
+    addButton = secondButton
+  }
+  else{
+    throw new Error('No existe el botón');
+  }
+
+  if(firstButton.text().includes("Limpiar Tareas Completadas")){
+    deleteButton = firstButton;
+  }
+  else if (secondButton.text().includes("Limpiar Tareas Completadas")){
+    deleteButton = secondButton
+  }
+  else{
+    throw new Error('No existe el botón');
+  }
+
+  wrapper.find("input[type='text']").getDOMNode().value = "New item";
+  addButton.simulate('click')
+
+  wrapper.find("input[type='text']").getDOMNode().value = "New item 2";
+  addButton.simulate('click')
+
+  wrapper.find("input[type='text']").getDOMNode().value = "New item 3";
+  addButton.simulate('click')
+
+
+  const tareaWrapper = wrapper.find(Tarea).last();
+  const div = tareaWrapper.find("div");
+  const label = div.find("label");
+  const checkbox = label.find('input[type="checkbox"]')
+
+  checkbox.simulate('change', {target: {checked: true}});
+
+  deleteButton.simulate('click');
+
+  expect(wrapper.find(Tarea).length).toBe(2)
+});
+
+
+test('App.js tiene 1 div con la cantidad de tareas por terminar | Asegúrate de renderizar 1 div con la cantidad de tareas por terminar dentro de App.js', () => {
+  const wrapper = mount(<App />);
+  const div = wrapper.find('div')
+  const buttons = wrapper.find('button')
+
+
+  const firstButton = buttons.at(0);
+  const secondButton = buttons.at(1);
+  let addButton = undefined;
+  let deleteButton = undefined;
+
+  if(firstButton.text().includes("Añadir Tarea")){
+    addButton = firstButton;
+  }
+  else if (secondButton.text().includes("Añadir Tarea")){
+    addButton = secondButton
+  }
+  else{
+    throw new Error('No existe el botón');
+  }
+
+  if(firstButton.text().includes("Limpiar Tareas Completadas")){
+    deleteButton = firstButton;
+  }
+  else if (secondButton.text().includes("Limpiar Tareas Completadas")){
+    deleteButton = secondButton
+  }
+  else{
+    throw new Error('No existe el botón');
+  }
+
+  wrapper.find("input[type='text']").getDOMNode().value = "New item";
+  addButton.simulate('click')
+
+  wrapper.find("input[type='text']").getDOMNode().value = "New item 2";
+  addButton.simulate('click')
+
+  wrapper.find("input[type='text']").getDOMNode().value = "New item 3";
+  addButton.simulate('click')
+
+  expect(div.first().text()).toContain(wrapper.find(Tarea).length.toString())
+
+  const tareaWrapper = wrapper.find(Tarea).last();
+  const tareaDiv = tareaWrapper.find("div");
+  const label = tareaDiv.find("label");
+  const checkbox = label.find('input[type="checkbox"]')
+
+  checkbox.simulate('change', {target: {checked: true}});
+
+  deleteButton.simulate('click');
+
+  expect(div.first().text()).toContain(wrapper.find(Tarea).length.toString())
+});
