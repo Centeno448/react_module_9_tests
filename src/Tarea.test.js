@@ -10,7 +10,7 @@ beforeAll(() => {
 const tarea = {
   id: 'caced729-15c2-45ad-aa26-58c05283a4cc',
   nombre: 'Nueva',
-  completado: false,
+  completado: true,
 };
 
 test('Tarea despliega el nombre de la tarea dentro de un label | Asegúrate de que Tarea tenga un label dentro del div y que este label tenga un checkbox con checked={tarea.completado} y depliegue en tarea.nombre', () => {

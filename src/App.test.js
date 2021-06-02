@@ -100,6 +100,48 @@ test('App utiliza ref | Asegúrate de que en App.js crees una ref llamada "tarea
   }
 });
 
+test('App no agrega una nueva tarea si el nombre está vacío | Asegúrate de que la función agregar tarea no cree una nueva tarea si es que el nombre de la tarea es vacío', () => {
+  const wrapper = mount(<App />);
+  const buttons = wrapper.find('button');
+
+  const firstButton = buttons.at(0);
+  const secondButton = buttons.at(1);
+  let addButton = undefined;
+
+  if (firstButton.text().includes('Añadir Tarea')) {
+    addButton = firstButton;
+  } else if (secondButton.text().includes('Añadir Tarea')) {
+    addButton = secondButton;
+  } else {
+    throw new Error('No existe el botón');
+  }
+
+  wrapper.find("input[type='text']").getDOMNode().value = '';
+  addButton.simulate('click');
+  expect(wrapper.find(Tarea).length).toBe(0);
+});
+
+test('App al agregar una tarea, resetea el valor de la refencia tareaNombreRef a un string vacío | Asegúrate de que la función agregar tarea coloque el valor de tareaNombreRef a un string vacío después de que haya creado la nueva tarea', () => {
+  const wrapper = mount(<App />);
+  const buttons = wrapper.find('button');
+
+  const firstButton = buttons.at(0);
+  const secondButton = buttons.at(1);
+  let addButton = undefined;
+
+  if (firstButton.text().includes('Añadir Tarea')) {
+    addButton = firstButton;
+  } else if (secondButton.text().includes('Añadir Tarea')) {
+    addButton = secondButton;
+  } else {
+    throw new Error('No existe el botón');
+  }
+
+  wrapper.find("input[type='text']").getDOMNode().value = 'asd';
+  addButton.simulate('click');
+  expect(wrapper.find("input[type='text']").getDOMNode().value).toBe('');
+});
+
 test('App agrega una nueva tarea | Asegúrate de que la función agregar tarea tome el valor de la referencia del input y llame a la función setTareas', () => {
   const wrapper = mount(<App />);
   const buttons = wrapper.find('button');
@@ -236,7 +278,7 @@ test('App elimina las tareas completadas | Asegúrate de que la función manejoL
   wrapper.find("input[type='text']").getDOMNode().value = 'New item 3';
   addButton.simulate('click');
 
-  const tareaWrapper = wrapper.find(Tarea).last();
+  const tareaWrapper = wrapper.find(Tarea).at(1);
   const div = tareaWrapper.find('div');
   const label = div.find('label');
   const checkbox = label.find('input[type="checkbox"]');
@@ -246,6 +288,11 @@ test('App elimina las tareas completadas | Asegúrate de que la función manejoL
   deleteButton.simulate('click');
 
   expect(wrapper.find(Tarea).length).toBe(2);
+  const tarea1 = wrapper.find(Tarea).at(0);
+  const tarea2 = wrapper.find(Tarea).at(1);
+
+  expect(tarea1.prop('tarea').nombre).toBe('New item');
+  expect(tarea2.prop('tarea').nombre).toBe('New item 3');
 });
 
 test('App.js tiene 1 div con la cantidad de tareas por terminar | Asegúrate de renderizar 1 div con la cantidad de tareas por terminar dentro de App.js', () => {
